@@ -1,11 +1,16 @@
-import logo from './logo.svg';
 import './App.css';
 import Map from "./Map.jsx"
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
+
+const client = new ApolloClient({
+  uri: "http://localhost:1337/graphql",
+  cache: new InMemoryCache()
+})
 
 function App() {
-  return <div>
+  return <ApolloProvider client={client}>
     <Map />
-  </div>
+  </ApolloProvider>
 }
 
 export default App;
