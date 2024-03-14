@@ -1,4 +1,31 @@
-#map {
+.Map {
     width: 100vw;
-    height: 100vh
+    height: 100vh;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.map-container {
+    height: 95vh;
+    width: 75%
+}
+
+.mapboxgl-popup-content {
+    width: 50vw;
+}
+
+#form {
+    width: 25%;
+    padding: 50px
+}
+
+#form form {
+    display: flex;
+    flex-direction: column;
+}
+
+#form p {
+    text-align: center
 }
