@@ -1,6 +1,6 @@
-import {useEffect, useRef} from "react"
+import {useEffect, useRef, useState} from "react"
 import mapboxgl from "mapbox-gl"
-import { useQuery, gql } from "@apollo/client"
+import { useQuery, gql, useMutation } from "@apollo/client"
 import { Converter } from "showdown"
 
 import "./map.css"
@@ -30,19 +30,48 @@ const QUERY_GET_POSTLIST = gql`
     }
 `
 
-
+const QUERY_CREATE_POSTLIST = gql`
+    mutation {
+        createPostlist (
+            data: {
+                posts: []
+            }
+        ) {
+            data {
+                id
+                attributes {
+                    posts {
+                        data {
+                            id
+                            attributes {
+                                latitude
+                                longitude
+                                content
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+`
 
 const Map = () => {
     const mapContainer = useRef(null)
     const map = useRef(null)
 
+    const params = new URLSearchParams(window.location.search)
+    const [id, setId] = useState(params.get("id"))
+
     const {loading, error, data : postlist} = useQuery(QUERY_GET_POSTLIST, {
         variables: {
-            id: 1
+            id: id
         }
     })
 
     const posts = postlist?.postlist?.data?.attributes?.posts
+
+    const [createPostlist] = useMutation(QUERY_CREATE_POSTLIST)
 
     useEffect(() => {
         map.current = new mapboxgl.Map({
@@ -63,6 +92,14 @@ const Map = () => {
             })
         }
     }, [posts])
+
+    useEffect(() => {
+        if (!loading && !postlist && map.current) {
+            createPostlist().then(data => {
+                window.location.href = "/?id="+data.data.createPostlist.data.id
+            })
+        }
+    }, [loading, postlist])
 
     return <div ref={mapContainer} id="map" />
 }
